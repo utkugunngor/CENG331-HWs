@@ -1,0 +1,39 @@
+# Utku Güngör - 2237477
+# Execution begins at address 0
+	.pos 0
+	irmovq stack,%rsp # Set up stack pointer
+	irmovq $8,%r10 #to increment addresses
+	call main # Execute main program
+	halt # Terminate program
+#sample linked list from the text
+.align 8
+ele1:
+	.quad 0x00a
+	.quad ele2
+ele2:
+	.quad 0x0b0
+	.quad ele3
+ele3:
+	.quad 0xc00
+	.quad 0
+#main program
+main:
+	irmovq ele1,%rdi #make ele1 the first parameter
+	call sum_list # Execute the function
+	ret
+#long sum_list function that has 1 argument stored in %rdi
+sum_list:
+	xorq %rax,%rax #initialize the result to zero
+	jmp test #check the loop condition
+loop:
+	mrmovq (%rdi),%r11 #put ls->val to caller-saved register %r11 and store
+	addq %r11,%rax #add that value to the result
+	addq %r10,%rdi 
+	mrmovq (%rdi),%rdi #make ls ls->next 
+test:
+	andq %rdi,%rdi # Set CC
+	jne loop #stop when ls is NULL
+	ret #else return
+.pos0x200 # Stack starts here and grows to lower addresses
+stack:
+	

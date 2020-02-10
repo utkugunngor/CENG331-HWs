@@ -1,0 +1,40 @@
+# Utku Güngör - 2237477
+# Execution begins at address 0
+	.pos 0
+	irmovq stack,%rsp # Set up stack pointer
+	call main # Execute main program
+	halt # Terminate program
+#sample linked list from the text
+.align 8
+ele1:
+	.quad 0x00a
+	.quad ele2
+ele2:
+	.quad 0x0b0
+	.quad ele3
+ele3:
+	.quad 0xc00
+	.quad 0
+#main program
+main:
+	irmovq ele1,%rdi #make ele1 the first parameter
+	call rsum_list # Execute the function
+	ret
+#long rsum_list function that has 1 argument stored in %rdi
+#similar to the rproduct function in the textbook problem 4.4
+rsum_list:
+	xorq %rax,%rax #initialize the result to zero
+	andq %rdi,%rdi # Set CC
+	je finish #if ls is NULL,return 0
+	irmovq $8,%r8 #to increment addresses
+	pushq %r11 #save caller-saved register
+	mrmovq (%rdi),%r11 #put ls->val to the caller-saved register %r11 and store
+	addq %r8,%rdi 
+	mrmovq (%rdi),%rdi #make ls ls->next 
+	call rsum_list #call the function with updated ls (ls->next)
+	addq %r11,%rax #add long val to the result
+	popq %r11 #restore caller-saved register
+finish:
+	ret
+.pos0x200 # Stack starts here and grows to lower addresses
+stack:

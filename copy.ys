@@ -1,0 +1,48 @@
+# Utku Güngör - 2237477
+# Execution begins at address 0
+	.pos 0
+	irmovq stack,%rsp # Set up stack pointer
+	call main # Execute main program
+	halt # Terminate program
+#sample linked list from the text
+
+.align 8
+# Source block
+src:
+	.quad 0x00a
+	.quad 0x0b0
+	.quad 0xc00
+# Destination block
+dest:
+	.quad 0x111
+	.quad 0x222
+	.quad 0x333
+#main program
+main:
+	irmovq src,%rdi #make src the first parameter
+	irmovq dest,%rsi #make dest the second parameter
+	irmovq $3,%rdx 
+	call copy_block # Execute the function
+	ret
+# long copy_block function that has 3 arguments stored in %rdi,%rsi,%rdx, respectively
+copy_block:
+	xorq %rax,%rax #initialize the result to zero
+	irmovq $8,%r8 # to increment pointer variables by the constant 8,we need to store 8 in a register
+	irmovq $1,%r9 # to decrement len by the constant 1,we need to store 1 in a register
+	jmp test #check the loop condition
+loop:
+	mrmovq (%rdi),%r11 #put pointed value by src to the caller-saved register %r11 and store
+	addq %r8,%rdi # increment the src
+	rmmovq %r11,(%rsi) #put val of %r11 to pointed value by dest
+	addq %r8,%rsi # increment the dest
+	xorq %r11,%rax # do the xor operation, store the result in %rax 
+	subq %r9,%rdx #decrement %rdx by 1
+test:
+	andq %rdx,%rdx # Set CC
+	jne loop #stop when len is not greater than 0
+	ret
+
+.pos0x200 # Stack starts here and grows to lower addresses
+stack:
+
+
